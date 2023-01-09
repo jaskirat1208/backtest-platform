@@ -5,7 +5,7 @@ with open("README.md", "r") as fh:
 
 setuptools.setup(
     name="alphatools_jv",
-    version="0.0.2",
+    version="0.0.5.1",
     author="Jaskirat Singh",
     author_email="jaskiratsingh1208@gmail.com",
     description="A small example package",

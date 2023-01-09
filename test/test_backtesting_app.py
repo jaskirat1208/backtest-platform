@@ -3,7 +3,7 @@ from unittest import TestCase
 from alphatools import backtesting_app
 from datetime import datetime
 
-from alphatools.utils.TokenManager import TokenManager
+from alphatools.utils.token_manager import TokenManager
 
 
 class TestBackTestingApp(TestCase):
