@@ -1,11 +1,12 @@
-from alphatools.base_trading_app import BaseTradingApp
 import configparser
 from datetime import datetime
+from time import sleep
 import pandas as pd
+
 from alphatools.utils.smartapi_helper import SmartApiHelper
 
 
-class BackTestingApp(BaseTradingApp):
+class BackTestingApp:
     instruments_list = []
     start_date = None
     end_date = None
@@ -49,21 +50,25 @@ class BackTestingApp(BaseTradingApp):
     def run(self):
         results_df = pd.DataFrame.from_records([],
                                        columns=['Timestamp', 'OPEN', 'HIGH', 'LOW', 'CLOSE', 'VOLUME'])
-        for token, exchange in self.instruments_list:
-            candle_info_params = {
-                "exchange": exchange,
-                "symboltoken": token,
-                "interval": self.data_interval,
-                "fromdate": datetime.strftime(self.start_date, '%Y-%m-%d %H:%M'),
-                "todate": datetime.strftime(self.end_date, '%Y-%m-%d %H:%M')
-            }
-            api_helper = SmartApiHelper(self.api_key, self.client_code, self.password, self.totp_key)
-            results = api_helper.get_candle_info(candle_info_params)['data']
-            df = pd.DataFrame.from_records(results,
-                                           columns=['Timestamp', 'OPEN', 'HIGH', 'LOW', 'CLOSE', 'VOLUME'])
-            df['Token'] = token
-            df['Timestamp'] = df['Timestamp'].apply(lambda x: self._get_time(x))
-            results_df = pd.concat([results_df, df])
+        for _date in pd.date_range(self.start_date, self.end_date):
+            for token, exchange in self.instruments_list:
+                candle_info_params = {
+                    "exchange": exchange,
+                    "symboltoken": token,
+                    "interval": self.data_interval,
+                    "fromdate": datetime.strftime(_date, '%Y-%m-%d 00:00'),
+                    "todate": datetime.strftime(_date, '%Y-%m-%d 23:59')
+                }
+                api_helper = SmartApiHelper(self.api_key, self.client_code, self.password, self.totp_key)
+                results = api_helper.get_candle_info(candle_info_params)['data']
+                if not results:
+                    continue
+                df = pd.DataFrame.from_records(results,
+                                               columns=['Timestamp', 'OPEN', 'HIGH', 'LOW', 'CLOSE', 'VOLUME'])
+                df['Token'] = token
+                df['Timestamp'] = df['Timestamp'].apply(lambda x: self._get_time(x))
+                results_df = pd.concat([results_df, df])
+                sleep(0.35)
 
         results_df = results_df.sort_values(by=['Timestamp', 'Token']).reset_index(drop=True)
         for idx, row in results_df.iterrows():
