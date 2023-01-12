@@ -21,6 +21,7 @@ class BackTestingApp:
         :param config_file:
         """
         super().__init__()
+        self.candle_info_df = None
         cfg_parser = configparser.ConfigParser()
         cfg_parser.read(config_file)
         self.api_key = cfg_parser.get('SMARTAPI_LOGIN', 'API_KEY')
@@ -32,25 +33,64 @@ class BackTestingApp:
     def _get_time(time):
         return datetime.strptime(time, '%Y-%m-%dT%H:%M:%S%z')
 
-    def onMd(self, dataRow):
-        self.logger.info("Received row: {}".format(dataRow))
+    def on_md(self, data_row):
+        """
+        Basic onMd template. You can create a child class with backtestingApp as parent to
+        come up with your own onMd function. See basic documentation.
+        :param data_row:
+        :return:
+        """
+        self.logger.info("Received row: {}".format(data_row))
         pass
 
     def add_instrument(self, token, exchange):
         self.instruments_list.append((token, exchange))
 
     def set_start_date(self, start_date):
+        """
+        Start datetime of simulation
+        :param start_date: datetime
+        :return: None
+        """
+
         self.start_date = start_date
 
     def set_end_date(self, end_date):
+        """
+        End datetime of simulation
+        :param end_date: datetime
+        :return: None
+        """
         self.end_date = end_date
 
     def set_interval(self, interval='ONE_MINUTE'):
+        """
+        Set frequency of requested data for simulation. Possible values:
+                Interval	Description
+                ONE_MINUTE	1 Minute
+                THREE_MINUTE	3 Minute
+                FIVE_MINUTE	5 Minute
+                TEN_MINUTE	10 Minute
+                FIFTEEN_MINUTE	15 Minute
+                THIRTY_MINUTE	30 Minute
+                ONE_HOUR	1 Hour
+                ONE_DAY	1 Day
+
+        :param interval: Requested interval
+
+        :return:
+        """
         self.data_interval = interval
 
-    def run(self):
-        results_df = pd.DataFrame.from_records([],
-                                               columns=['Timestamp', 'OPEN', 'HIGH', 'LOW', 'CLOSE', 'VOLUME'])
+    def load_data(self):
+        """
+        Based on the instrument info requested, sends get Request to AB smart API server
+
+        :return: None
+        """
+        self.candle_info_df = pd.DataFrame.from_records([],
+                                                        columns=['Timestamp', 'OPEN', 'HIGH', 'LOW', 'CLOSE', 'VOLUME'])
+
         for _date in pd.date_range(self.start_date, self.end_date):
             for token, exchange in self.instruments_list:
                 candle_info_params = {
@@ -70,9 +110,31 @@ class BackTestingApp:
                                                columns=['Timestamp', 'OPEN', 'HIGH', 'LOW', 'CLOSE', 'VOLUME'])
                 df['Token'] = token
                 df['Timestamp'] = df['Timestamp'].apply(lambda x: self._get_time(x))
-                results_df = pd.concat([results_df, df])
+                self.candle_info_df = pd.concat([self.candle_info_df, df])
                 sleep(0.35)
 
-        results_df = results_df.sort_values(by=['Timestamp', 'Token']).reset_index(drop=True)
-        for idx, row in results_df.iterrows():
-            self.onMd(row)
+        self.candle_info_df = self.candle_info_df.sort_values(by=['Timestamp', 'Token']).reset_index(drop=True)
+
+    def get_candle_info_df(self, num_rows=-1):
+        """
+        Returns top n rows of the candle info dataframe
+
+        :param num_rows: Number of rows required for training purposes
+        :return: pandas dataframe
+        """
+        if num_rows == -1:
+            return self.candle_info_df
+
+        return self.candle_info_df.head(num_rows)
+
+    def simulate(self, start=0):
+        """
+        Runs simulation from the required position. It is recommended to use simulate without
+        args to simulate everything online one by one.
+
+        :param start: Offset starting position of online simulation
+        :return: None
+        """
+        for idx, row in self.candle_info_df.iterrows():
+            if idx >= start:
+                self.onMd(row)

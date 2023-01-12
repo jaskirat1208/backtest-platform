@@ -15,9 +15,9 @@ from datetime import datetime
 
 class TestSmartApiApp(BackTestingApp):
 
-    def onMd(self, dataRow):
+    def on_md(self, data_row):
         # your strat code goes here
-        print("New row found: ")
+        print("New row found: {}".format(data_row))
 
 
 app = TestSmartApiApp('/Users/jaskiratsingh/projects/smart-api-creds.ini')
