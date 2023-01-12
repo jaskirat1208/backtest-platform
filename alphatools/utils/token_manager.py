@@ -1,3 +1,4 @@
+import logging
 from collections import defaultdict
 
 from multipledispatch import dispatch
@@ -6,12 +7,13 @@ from alphatools.utils.smartapi_helper import SmartApiHelper
 
 
 class TokenManager:
-
+    logger = logging.getLogger(__name__)
     token_to_instrument_info = defaultdict(None)
     symbol_to_instrument_info = defaultdict(None)
 
     def __init__(self):
         instruments_json = SmartApiHelper.get_instruments_list()
+        self.logger.info("Instruments Received: {}".format(len(instruments_json)))
         for instrument in instruments_json:
             try:
                 token = int(instrument['token'])
@@ -19,7 +21,10 @@ class TokenManager:
                 self.token_to_instrument_info[token] = instrument
                 self.symbol_to_instrument_info[symbol] = instrument
             except ValueError as e:
-                print('Invalid token for instrument {}. Skipping this row'.format(instrument))
+                self.logger.debug('Invalid token for instrument {}. Skipping this row'.format(instrument))
+
+        self.logger.info("Instruments processed successfully: {}".format(len(self.token_to_instrument_info)))
+
 
     @dispatch(int)
     def get_instrument(self, token):
@@ -52,6 +57,7 @@ class TokenManager:
         :return: Refer @get_instrument for more details
         """
         symbol = "{}{}FUT".format(name, expiry)
+        self.logger.info("Searching for symbol: {}".format(symbol))
         return self.get_instrument(symbol)
 
     def get_opt(self, name, strike, expiry, option_type):
@@ -64,4 +70,5 @@ class TokenManager:
         :return: Returns a dictionary in the following format or None if the instrument is invalid/not found
         """
         symbol = "{}{}{}{}".format(name, strike, expiry, option_type)
+        self.logger.info("Searching for symbol: {}".format(symbol))
         return self.get_instrument(symbol)

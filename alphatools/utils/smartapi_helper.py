@@ -1,11 +1,14 @@
 from smartapi import SmartWebSocket, SmartConnect
 import mintotp
 import requests
+import logging
 
 INSTRUMENT_API_URL = 'http://margincalculator.angelbroking.com/OpenAPI_File/files/OpenAPIScripMaster.json'
 
 
 class SmartApiHelper:
+    logger = logging.getLogger(__name__)
+
     def __init__(self, api_key, client_code, password, totp_key):
         self.api_key = api_key
         self.client_code = client_code
@@ -26,6 +29,6 @@ class SmartApiHelper:
             candle_info_results = smart_conn.getCandleData(candle_info_params)
             smart_conn.terminateSession(self.client_code)
         except Exception as e:
-            print("Historical API failed with exception: {}".format(e.message))
+            self.logger.error("Historical API failed with exception: {}".format(e.message))
 
         return candle_info_results
