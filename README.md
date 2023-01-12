@@ -26,7 +26,9 @@ app.set_end_date(datetime.strptime('2022-12-29 11:39:00+05:30', '%Y-%m-%d %H:%M:
 app.set_interval('ONE_MINUTE')
 app.add_instrument(53825, "NFO")
 app.add_instrument(48756, "NFO")
-app.run()
+app.load_data()                     # Loads the data into a dataframe
+app.get_candle_info_df()            # Returns the entire simulation dataframe
+app.simulate()                      # Starts simulation from the beginning
 ```
 
 ## Helper for instruments
