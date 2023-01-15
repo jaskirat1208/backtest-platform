@@ -44,6 +44,12 @@ class BackTestingApp:
         pass
 
     def add_instrument(self, token, exchange):
+        """
+        Adds an instrument to the subscriber list
+        :param token: token number of the instrument
+        :param exchange: Exchange in which the instrument is traded
+        :return:
+        """
         self.instruments_list.append((token, exchange))
 
     def set_start_date(self, start_date):
@@ -127,6 +133,21 @@ class BackTestingApp:
 
         return self.candle_info_df.head(num_rows)
 
+    def get_row_number(self, timestamp):
+        """
+        Returns index of the last row of df such that df.timestamp < timestamp.
+        Makes it more convenient to split training and test dataset.
+
+        For example, you want to train the model initially for say 9:30-11:30 and
+        run the rest of the simulation online. Call this function to get the row number
+        corresponding to 11:30 and send it to the functions simulate and
+        get_candle_info_df() function.
+
+        :param timestamp:  Benchmark time to split into training and test
+        :return: Index of row
+        """
+        return len(self.candle_info_df[self.candle_info_df['Timestamp'] < timestamp])
+
     def simulate(self, start=0):
         """
         Runs simulation from the required position. It is recommended to use simulate without
@@ -137,4 +158,4 @@ class BackTestingApp:
         """
         for idx, row in self.candle_info_df.iterrows():
             if idx >= start:
-                self.onMd(row)
+                self.on_md(row)
