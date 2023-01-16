@@ -21,6 +21,7 @@ class TestBackTestingApp(TestCase):
         app.add_instrument(48756, "NFO")
         app.load_data()                     # Loads the data into a dataframe
         app.simulate()                      # Starts simulation from the beginning
+        app.get_row_number(datetime.strptime('2022-12-23 11:39:00+05:30', '%Y-%m-%d %H:%M:%S%z'))
         app.get_candle_info_df()            # Returns the entire simulation dataframe
 
     def test_run_backtesting_engine_advanced(self):
