@@ -29,6 +29,12 @@ app.add_instrument(48756, "NFO")
 app.load_data()                     # Loads the data into a dataframe
 app.get_candle_info_df()            # Returns the entire simulation dataframe
 app.simulate()                      # Starts simulation from the beginning
+
+# To place a trade, use trade api to send the orders to the pnl calculator. 
+# Pnl calculator uses last tick prices to calculate the observed Pnl
+app.trade(53825, 1)     # Buys 1 unit for token 53825
+app.trade(53825, -3)    # Sells 3 units for token 53825
+app.get_total_pnl()     # Returns pnl after all trades are made
 ```
 
 ## Helper for instruments

@@ -31,7 +31,7 @@ class BackTestingAppOnDummyData(backtesting_app.BackTestingApp):
         self.trade(data_row.Token, 1)
 
     def post_simulation(self):
-        self.logger.info("Total Pnl: {}".format(self.pnl_calculator.get_total_pnl()))
+        self.logger.info("Total Pnl: {}".format(self.get_total_pnl()))
 
 
 class TestBackTestingApp(TestCase):

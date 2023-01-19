@@ -175,6 +175,14 @@ class BackTestingApp:
         self.post_simulation()
 
     def post_simulation(self):
+        """
+        This can be overriden to do some cleanup tasks at the end of simulation
+        :return:
+        """
         pass
+
     def trade(self, token, qty):
         self.pnl_calculator.trade(token, qty)
+
+    def get_total_pnl(self):
+        return self.pnl_calculator.get_total_pnl()
