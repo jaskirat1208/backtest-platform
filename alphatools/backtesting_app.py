@@ -5,6 +5,7 @@ import logging
 from datetime import datetime
 from time import sleep
 
+from alphatools.utils.pnl_calculator import PnlCalculator
 from alphatools.utils.smartapi_helper import SmartApiHelper
 
 
@@ -14,6 +15,7 @@ class BackTestingApp:
     start_date = None
     end_date = None
     data_interval = 'ONE_MINUTE'
+    pnl_calculator = PnlCalculator()
 
     def __init__(self, config_file):
         """
@@ -33,6 +35,11 @@ class BackTestingApp:
     def _get_time(time):
         return datetime.strptime(time, '%Y-%m-%dT%H:%M:%S%z')
 
+    def _on_md(self, data_row):
+        token = data_row["Token"]
+        self.pnl_calculator.on_md(token, data_row)
+        self.on_md(data_row)
+
     def on_md(self, data_row):
         """
         Basic onMd template. You can create a child class with backtestingApp as parent to
@@ -51,6 +58,7 @@ class BackTestingApp:
         :return:
         """
         self.instruments_list.append((token, exchange))
+        self.pnl_calculator.add_instrument_to_watch_list(token)
 
     def set_start_date(self, start_date):
         """
@@ -88,6 +96,18 @@ class BackTestingApp:
         """
         self.data_interval = interval
 
+    def _get_candle_info_results(self, _date, token, exchange):
+        candle_info_params = {
+            "exchange": exchange,
+            "symboltoken": token,
+            "interval": self.data_interval,
+            "fromdate": datetime.strftime(_date, '%Y-%m-%d 00:00'),
+            "todate": datetime.strftime(_date, '%Y-%m-%d 23:59')
+        }
+        self.logger.info("Sending candle request for {}".format(candle_info_params))
+        api_helper = SmartApiHelper(self.api_key, self.client_code, self.password, self.totp_key)
+        return api_helper.get_candle_info(candle_info_params)['data']
+
     def load_data(self):
         """
         Based on the instrument info requested, sends get Request to AB smart API server
@@ -99,18 +119,10 @@ class BackTestingApp:
 
         for _date in pd.date_range(self.start_date, self.end_date):
             for token, exchange in self.instruments_list:
-                candle_info_params = {
-                    "exchange": exchange,
-                    "symboltoken": token,
-                    "interval": self.data_interval,
-                    "fromdate": datetime.strftime(_date, '%Y-%m-%d 00:00'),
-                    "todate": datetime.strftime(_date, '%Y-%m-%d 23:59')
-                }
-                self.logger.info("Sending candle request for {}".format(candle_info_params))
-                api_helper = SmartApiHelper(self.api_key, self.client_code, self.password, self.totp_key)
-                results = api_helper.get_candle_info(candle_info_params)['data']
+                results = self._get_candle_info_results(_date, token, exchange)
                 if not results:
-                    self.logger.error("No data available for params: {}".format(candle_info_params))
+                    self.logger.warning("No data available for Date: {}, "
+                                      "Token: {}, Exchange: {}".format(_date, token, exchange))
                     continue
                 df = pd.DataFrame.from_records(results,
                                                columns=['Timestamp', 'OPEN', 'HIGH', 'LOW', 'CLOSE', 'VOLUME'])
@@ -158,4 +170,11 @@ class BackTestingApp:
         """
         for idx, row in self.candle_info_df.iterrows():
             if idx >= start:
-                self.on_md(row)
+                self._on_md(row)
+
+        self.post_simulation()
+
+    def post_simulation(self):
+        pass
+    def trade(self, token, qty):
+        self.pnl_calculator.trade(token, qty)
