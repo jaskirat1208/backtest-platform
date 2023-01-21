@@ -23,9 +23,9 @@ class PnlCalculator:
         instrument_pnl_calc = self.instrument_pnl_calculators[token]
         instrument_pnl_calc.trade(qty)
 
-    def get_total_pnl(self):
+    def get_total_pnl(self, price_metric="CLOSE"):
         result = 0
         for pnl_calculator in self.instrument_pnl_calculators.values():
-            result += pnl_calculator.get_total_pnl()
+            result += pnl_calculator.get_total_pnl(price_metric)
 
         return result

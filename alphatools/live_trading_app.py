@@ -5,6 +5,7 @@ import mintotp
 from smartapi import SmartConnect
 
 from alphatools.utils.exchange import Exchange
+from alphatools.utils.pnl_calculator import PnlCalculator
 from alphatools.utils.smart_ws_v2 import SmartWebSocketV2
 
 
@@ -19,6 +20,7 @@ class LiveTradingApp:
         self.client_code = cfg_parser.get('SMARTAPI_LOGIN', 'CLIENT_CODE')
         self.password = cfg_parser.get('SMARTAPI_LOGIN', 'PASSWORD')
         self.totp_key = cfg_parser.get('SMARTAPI_LOGIN', 'TOTP_KEY')
+        self.pnl_calculator = PnlCalculator()
 
         smart_conn = SmartConnect(api_key=self.api_key)
         totp = mintotp.totp(self.totp_key)
@@ -52,11 +54,15 @@ class LiveTradingApp:
     def _on_error(self, ws, message):
         self.logger.error(message)
 
-    def on_md(self, ws, md):
+    def _on_md(self, ws, md):
+        self.pnl_calculator.on_md(md)
+        self.on_md(md)
+
+    def on_md(self, md):
         self.logger.info("Received feed: {}".format(md))
 
     def on_close(self, ws):
-        pass
+        self.pnl_calculator.get_total_pnl(price_metric="last_traded_price")
 
     def simulate(self):
         self.smart_ws.on_open = self._on_open

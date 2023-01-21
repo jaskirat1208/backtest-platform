@@ -1,7 +1,7 @@
 twine
 wheel
 smartapi-python
-websocket-client
+websocket-client~=1.4.2
 multipledispatch~=0.6.0
 mintotp~=0.3.0
 requests~=2.28.1

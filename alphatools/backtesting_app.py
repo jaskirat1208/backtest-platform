@@ -11,17 +11,18 @@ from alphatools.utils.smartapi_helper import SmartApiHelper
 
 class BackTestingApp:
     logger = logging.getLogger(__name__)
-    instruments_list = []
     start_date = None
     end_date = None
     data_interval = 'ONE_MINUTE'
-    pnl_calculator = PnlCalculator()
 
     def __init__(self, config_file):
         """
 
         :param config_file:
         """
+        self.pnl_calculator = PnlCalculator()
+        self.instruments_list = []
+
         super().__init__()
         self.candle_info_df = None
         cfg_parser = configparser.ConfigParser()
@@ -114,8 +115,9 @@ class BackTestingApp:
 
         :return: None
         """
-        self.candle_info_df = pd.DataFrame.from_records([],
-                                                        columns=['Timestamp', 'OPEN', 'HIGH', 'LOW', 'CLOSE', 'VOLUME'])
+        self.candle_info_df = pd.DataFrame()
+        # self.candle_info_df = pd.DataFrame.from_records([],
+        #                                                 columns=['Timestamp', 'OPEN', 'HIGH', 'LOW', 'CLOSE', 'VOLUME'])
 
         for _date in pd.date_range(self.start_date, self.end_date):
             for token, exchange in self.instruments_list:

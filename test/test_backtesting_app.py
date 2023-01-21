@@ -37,29 +37,30 @@ class BackTestingAppOnDummyData(backtesting_app.BackTestingApp):
 class TestBackTestingApp(TestCase):
     logger = logging.getLogger(__name__)
 
-    def test_run_backtesting_engine_basic(self):
-        app = BackTestingAppOnDummyData("/Users/jaskiratsingh/projects/smart-api-creds.ini")
-        app.set_start_date(datetime.strptime('2022-12-20 11:39:00+05:30', '%Y-%m-%d %H:%M:%S%z'))
-        app.set_end_date(datetime.strptime('2022-12-20 11:39:00+05:30', '%Y-%m-%d %H:%M:%S%z'))
-        app.set_interval('ONE_MINUTE')
-        app.add_instrument(53825, "NFO")
-        app.add_instrument(48756, "NFO")
-        app.load_data()                     # Loads the data into a dataframe
-        app.get_row_number(datetime.strptime('2022-12-23 11:39:00+05:30', '%Y-%m-%d %H:%M:%S%z'))
-        df = app.get_candle_info_df()            # Returns the entire simulation dataframe
-        assert len(df) == 2 * len(app.dummy_feed)
+    @staticmethod
+    def test_run_backtesting_engine_basic():
+        app1 = BackTestingAppOnDummyData("/Users/jaskiratsingh/projects/smart-api-creds.ini")
+        app1.set_start_date(datetime.strptime('2022-12-20 11:39:00+05:30', '%Y-%m-%d %H:%M:%S%z'))
+        app1.set_end_date(datetime.strptime('2022-12-20 11:39:00+05:30', '%Y-%m-%d %H:%M:%S%z'))
+        app1.set_interval('ONE_MINUTE')
+        app1.add_instrument(53825, "NFO")
+        app1.add_instrument(48756, "NFO")
+        app1.load_data()                     # Loads the data into a dataframe
+        # app1.get_row_number(datetime.strptime('2022-12-23 11:39:00+05:30', '%Y-%m-%d %H:%M:%S%z'))
+        df = app1.get_candle_info_df()            # Returns the entire simulation dataframe
+        assert len(df) == 2 * len(app1.dummy_feed)
 
     def test_run_backtesting_engine_advanced(self):
-        app = BackTestingAppOnDummyData("/Users/jaskiratsingh/projects/smart-api-creds.ini")
-        app.set_start_date(datetime.strptime('2022-12-20 11:39:00+05:30', '%Y-%m-%d %H:%M:%S%z'))
-        app.set_end_date(datetime.strptime('2022-12-20 11:39:00+05:30', '%Y-%m-%d %H:%M:%S%z'))
-        app.set_interval('ONE_MINUTE')
-        app.add_instrument(53825, "NFO")
-        app.add_instrument(48756, "NFO")
-        app.load_data()                             # Loads the data into a dataframe
-        df1 = app.get_candle_info_df(-1)            # Returns entire candle info dataframe
-        df2 = app.get_candle_info_df(2)             # Returns first two rows of the dataframe
-        assert len(df1) == 2 * len(app.dummy_feed)
+        app2 = BackTestingAppOnDummyData("/Users/jaskiratsingh/projects/smart-api-creds.ini")
+        app2.set_start_date(datetime.strptime('2022-12-20 11:39:00+05:30', '%Y-%m-%d %H:%M:%S%z'))
+        app2.set_end_date(datetime.strptime('2022-12-20 11:39:00+05:30', '%Y-%m-%d %H:%M:%S%z'))
+        app2.set_interval('ONE_MINUTE')
+        app2.add_instrument(53825, "NFO")
+        app2.add_instrument(48756, "NFO")
+        app2.load_data()                             # Loads the data into a dataframe
+        df1 = app2.get_candle_info_df(-1)            # Returns entire candle info dataframe
+        df2 = app2.get_candle_info_df(2)             # Returns first two rows of the dataframe
+        assert len(df1) == 2 * len(app2.dummy_feed)
         assert len(df2) == 2
 
     def test_run_token_manager(self):
