@@ -28,7 +28,7 @@ class InstrumentPnlCalculator:
 
     def get_total_pnl(self):
         position = self.total_buy_qty - self.total_sell_qty
-        if not len(self.last_feed_info) :
+        if not len(self.last_feed_info):
             return 0
         last_price = self.last_feed_info.CLOSE
         pnl = position * last_price - (self.total_buy_val - self.total_sell_val)
