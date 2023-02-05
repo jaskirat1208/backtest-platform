@@ -60,7 +60,7 @@ class TokenManager:
         self.logger.info("Searching for symbol: {}".format(symbol))
         return self.get_instrument(symbol)
 
-    def get_opt(self, name, strike, expiry, option_type):
+    def get_opt(self, name, expiry, strike, option_type):
         """
         Returns properties of option with requested params
         :param name: Underlying symbol
@@ -69,6 +69,6 @@ class TokenManager:
         :param option_type: Put or call
         :return: Returns a dictionary in the following format or None if the instrument is invalid/not found
         """
-        symbol = "{}{}{}{}".format(name, strike, expiry, option_type)
+        symbol = "{}{}{}{}".format(name, expiry, strike, option_type)
         self.logger.info("Searching for symbol: {}".format(symbol))
         return self.get_instrument(symbol)

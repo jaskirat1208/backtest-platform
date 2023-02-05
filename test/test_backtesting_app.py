@@ -66,3 +66,5 @@ class TestBackTestingApp(TestCase):
         app = TokenManager()
         self.logger.info(app.get_instrument('BANKNIFTY23FEB23FUT'))
         self.logger.info(app.get_instrument(48756))
+        self.logger.info(app.get_opt("NIFTY", "09FEB23", 16000, "PE"))
+
