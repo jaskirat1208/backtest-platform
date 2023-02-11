@@ -1,10 +1,14 @@
 import logging
 from collections import defaultdict
+from datetime import date
 
 from multipledispatch import dispatch
 
-from alphatools.utils.smartapi_helper import SmartApiHelper
+from alphatools.utils.smartapi_helper import *
 
+
+def _instruments_api_hash(sim_date):
+    return str(sim_date)
 
 class TokenManager:
     logger = logging.getLogger(__name__)
@@ -12,7 +16,7 @@ class TokenManager:
     symbol_to_instrument_info = defaultdict(None)
 
     def __init__(self):
-        instruments_json = SmartApiHelper.get_instruments_list()
+        instruments_json = self._get_instruments_list(date.today())
         self.logger.info("Instruments Received: {}".format(len(instruments_json)))
         for instrument in instruments_json:
             try:
@@ -25,6 +29,9 @@ class TokenManager:
 
         self.logger.info("Instruments processed successfully: {}".format(len(self.token_to_instrument_info)))
 
+    @cache.cache_to_file(CACHE_FILE_PATH, _instruments_api_hash)
+    def _get_instruments_list(self, sim_date):
+        return SmartApiHelper.get_instruments_list()
 
     @dispatch(int)
     def get_instrument(self, token):
