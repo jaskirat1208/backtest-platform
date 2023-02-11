@@ -43,6 +43,7 @@ class SmartApiHelper:
             candle_info_results = smart_conn.getCandleData(candle_info_params)
             smart_conn.terminateSession(self.client_code)
         except Exception as e:
-            self.logger.error("Historical API failed with exception: {}".format(e.message))
+            logging.exception("Historical API failed with exception")
+            # self.logger.error()
 
         return candle_info_results
