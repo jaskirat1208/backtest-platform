@@ -3,12 +3,11 @@ import setuptools
 with open("README.md", "r") as fh:
     long_description = fh.read()
 
-with open(".github/VERSION", "r") as fh:
-    app_version = fh.read()
+__version__ = "2.0.0"
 
 setuptools.setup(
     name="alphatools_jv",
-    version=app_version,
+    version=__version__,
     author="Jaskirat Singh",
     author_email="jaskiratsingh1208@gmail.com",
     description="A small example package",

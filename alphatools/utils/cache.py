@@ -16,7 +16,7 @@ def cache_to_file(dir_name, _hash):
             except (IOError, ValueError):
                 cache = {}
 
-            if hash_result not in cache:
+            if hash_result not in cache or not cache[hash_result]:
                 logger.debug("Could not find results in cache. Calling the function to get results")
                 cache[hash_result] = original_func(self, params)
                 f = open(file_name, 'w')
