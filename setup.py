@@ -3,7 +3,7 @@ import setuptools
 with open("README.md", "r") as fh:
     long_description = fh.read()
 
-__version__ = "2.0.0"
+__version__ = "2.1.1"
 
 setuptools.setup(
     name="alphatools_jv",

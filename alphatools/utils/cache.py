@@ -1,6 +1,10 @@
 import json
 import logging
 
+logging.basicConfig(
+    level=logging.INFO,
+    format='%(levelname)-8s [%(asctime)s] : %(message)s'
+)
 
 def cache_to_file(dir_name, _hash):
     def decorator(original_func):
