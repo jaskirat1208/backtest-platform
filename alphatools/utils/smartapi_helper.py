@@ -53,6 +53,5 @@ class SmartApiHelper:
                 time.sleep(5)
                 n_retries_left -= 1
                 logging.info("Retrying. {} retries left".format(n_retries_left))
-            # self.logger.error()
 
-        return candle_info_results
+            return candle_info_results
