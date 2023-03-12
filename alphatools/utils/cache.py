@@ -2,8 +2,8 @@ import json
 import logging
 
 logging.basicConfig(
-    level=logging.INFO,
-    format='%(levelname)-8s [%(asctime)s] : %(message)s'
+    format='[%(asctime)s] %(levelname)-8s {%(pathname)s:%(lineno)d} : %(message)s',
+    datefmt='%Y-%m-%d %H:%M:%S', level=logging.WARNING
 )
 
 def cache_to_file(dir_name, _hash):
