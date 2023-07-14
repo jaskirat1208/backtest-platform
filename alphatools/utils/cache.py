@@ -2,7 +2,7 @@ import json
 import logging
 
 logging.basicConfig(
-    format='[%(asctime)s] %(levelname)-8s {%(pathname)s:%(lineno)d} : %(message)s',
+    format='[%(asctime)s] %(levelname)-8s {%(filename)s:%(lineno)d} : %(message)s',
     datefmt='%Y-%m-%d %H:%M:%S', level=logging.WARNING
 )
 

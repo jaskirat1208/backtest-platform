@@ -30,6 +30,7 @@ class BackTestingApp:
         self.client_code = cfg_parser.get('SMARTAPI_LOGIN', 'CLIENT_CODE')
         self.password = cfg_parser.get('SMARTAPI_LOGIN', 'PASSWORD')
         self.totp_key = cfg_parser.get('SMARTAPI_LOGIN', 'TOTP_KEY')
+        self.instruments_list = []
 
     @staticmethod
     def _get_time(time):
@@ -114,11 +115,13 @@ class BackTestingApp:
 
         :return: None
         """
+        self.logger.info("Loading data")
         self.candle_info_df = pd.DataFrame.from_records([],
                                                         columns=['Timestamp', 'OPEN', 'HIGH', 'LOW', 'CLOSE', 'VOLUME'])
 
         for _date in pd.date_range(self.start_date, self.end_date):
             for token, exchange in self.instruments_list:
+                self.logger.debug("Loading data for date: {}, {}, {}".format(_date, token, exchange))
                 results = self._get_candle_info_results(_date, token, exchange)
                 if not results:
                     self.logger.warning("No data available for Date: {}, "
