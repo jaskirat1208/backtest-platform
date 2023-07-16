@@ -1,3 +1,5 @@
+#!/usr/bin/env python3
+
 import argparse
 from typing import IO
 
@@ -15,9 +17,14 @@ class InstrumentsCliPrompt(AlphaToolsCliPrompt):
         print(self.token_manager.get_instrument(int(instrument_id)))
         pass
 
-    def help_getInstrumentInfo(self):
-        print("Returns Instrument symbol for symbol")
+    def do_getInstrumentInfoForSymbol(self, symbol):
+        print(self.token_manager.get_instrument(symbol))
 
+    def help_getInstrumentInfo(self):
+        print("Returns Instrument symbol for instrument id")
+
+    def help_getInstrumentInfoForSymbol(self):
+        print("Returns Instrument symbol for symbol")
 
 
 if __name__ == '__main__':

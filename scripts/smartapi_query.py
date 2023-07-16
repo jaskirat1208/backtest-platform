@@ -1,3 +1,6 @@
+#!/usr/bin/env python3
+
+
 import configparser
 from typing import IO
 
@@ -54,9 +57,6 @@ class SmartApiQueryPrompt(AlphaToolsCliPrompt):
 
     def help_getCandleInfo(self):
         print("Returns candle info")
-
-        
-
 
 
 if __name__ == '__main__':

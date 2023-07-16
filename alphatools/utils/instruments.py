@@ -2,6 +2,7 @@ import nsepython
 from datetime import datetime
 from functools import lru_cache
 from enum import Enum
+import pandas as pd
 
 from alphatools.utils.token_manager import TokenManager
 
@@ -31,6 +32,19 @@ def get_kth_expiry(symbol, k=1, type=ExpiryType.WEEKLY):
 
 @lru_cache(maxsize=None)
 def _get_expiry_list(symbol, type='list'):
+    try:
+        _get_expiry_lists(symbol=symbol, type=type)
+    except Exception as e:
+        print("Some exception occured. Returning current expiry as list")
+        next_expiry = '20-JUL-2023'
+        next2next_expiry = '20-JUL-2023'
+        if type == 'list':
+            convert_to_date = lambda exp_date: _convert_date(exp_date, '%d-%b-%Y', '%d%b%y').upper()
+            return [convert_to_date(next_expiry), convert_to_date(next2next_expiry)]
+        else:
+            return pd.DataFrame({'Date': [next_expiry, next2next_expiry]})
+
+def _get_expiry_lists(symbol, type='list'):
     if type != 'list':
         return nsepython.expiry_list(symbol, type)
     convert_to_date = lambda exp_date: _convert_date(exp_date, '%d-%b-%Y', '%d%b%y').upper()
@@ -48,8 +62,8 @@ def round_to_base(n, base= 10):
 
 def get_derivatives(symbol):
     if symbol == "NIFTY" or symbol == 'FINNIFTY':
-        min_strike = 17500
-        max_strike = 18500
+        min_strike = 18500
+        max_strike = 20500
         interval = 50
 
         token_manager = TokenManager()
@@ -76,8 +90,11 @@ def get_derivatives(symbol):
 
 if __name__ == '__main__':
     # Instruments test
+    import logging
+    logging.basicConfig(level=logging.DEBUG)
     exp_list = _get_expiry_list('NIFTY')
     d = get_derivatives('NIFTY')
+    print(d)
     # Expiry date test
     exp_date = get_kth_expiry('FINNIFTY', type=ExpiryType.MONTHLY)
     print(exp_date)

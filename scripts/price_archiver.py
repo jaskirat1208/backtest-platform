@@ -9,17 +9,11 @@ from alphatools.utils import instruments
 
 import logging
 
-# logging.getLogger().setLevel(logging.DEBUG)
-# formatter = logging.Formatter(fmt='[%(filename)s:%(lineno)s :%(asctime)s: %(funcName)s] %(levelname)-8s : %(message)s',
-#                                 datefmt='%Y-%m-%d %H:%M:%S')
-# import sys
-# # handler = logging.StreamHandler(sys.stdout)
-# # handler.setFormatter(formatter)
 
 class PriceArchiverStrat(BackTestingApp):
     def __init__(self, creds):
         # self.logger.addHandler(handler)
-        self.logger.setLevel(logging.INFO)
+        self.logger.setLevel(logging.DEBUG)
         super().__init__(creds)
 
     def load_instruments(self, underliers, start_date, end_date):
@@ -49,5 +43,5 @@ if __name__ == '__main__':
     args = parser.parse_args()
     start_date = datetime.strptime(args.start_date, '%Y%m%d')
     end_date = datetime.strptime(args.end_date, '%Y%m%d')
-    strat = PriceArchiverStrat('/Users/jaskiratsingh/projects/smart-api-creds.ini')
+    strat = PriceArchiverStrat('/Users/jaskiratsingh/projects/smart-api-creds.papa.ini')
     strat.load_instruments(args.underlying, start_date, end_date)
