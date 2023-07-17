@@ -1,0 +1,3 @@
+[tool.semantic_release]
+version_source = "commit"
+version_variable = "setup.py:__version__"

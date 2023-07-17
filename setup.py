@@ -25,6 +25,6 @@ setuptools.setup(
         "License :: OSI Approved :: MIT License",
     ],
     test_suite="test",
-    scripts=glob.glob('quantlib/quantlib/main/*.py'),
+    scripts=glob.glob('scripts/*'),
     install_requires=install_requires
 )
