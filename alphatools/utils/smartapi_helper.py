@@ -1,6 +1,6 @@
 import time
 
-from smartapi import SmartWebSocket, SmartConnect
+from SmartApi import SmartConnect
 import mintotp
 import requests
 import logging
@@ -35,8 +35,22 @@ class SmartApiHelper:
         instruments_csv_list = requests.get(INSTRUMENT_API_URL)
         return instruments_csv_list.json()
 
-    @cache.cache_to_file(CACHE_FILE_PATH, _candle_info_params_hash)
     def get_candle_info(self, candle_info_params):
+        candle_info = self._get_candle_info(candle_info_params)
+        if 'data' not in candle_info or not candle_info['data']:
+            # print (candle_info['data'])
+            # print("Could not load data from cache")
+            return self._get_candle_info(candle_info_params, force_reload=True)
+        
+        return candle_info
+    
+    @cache.cache_to_file(CACHE_FILE_PATH, _candle_info_params_hash)
+    # def _get_candle_info_wrap(self, candle_info_params):
+    #     self.logger.info("Calling getCandleInfo wrapper")
+
+    #     return self._get_candle_info(candle_info_params)
+
+    def _get_candle_info(self, candle_info_params):
         candle_info_results = []
 
         n_retries_left = 3
@@ -44,7 +58,8 @@ class SmartApiHelper:
             try:
                 smart_conn = SmartConnect(api_key=self.api_key)
                 totp = mintotp.totp(self.totp_key)
-                smart_conn.generateSession(self.client_code, self.passwd, totp)
+                conn = smart_conn.generateSession(self.client_code, self.passwd, totp)
+                refresh_token = conn['data']['refreshToken']
                 candle_info_results = smart_conn.getCandleData(candle_info_params)
                 smart_conn.terminateSession(self.client_code)
             except Exception as e:

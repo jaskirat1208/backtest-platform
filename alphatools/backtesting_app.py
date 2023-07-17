@@ -30,6 +30,7 @@ class BackTestingApp:
         self.client_code = cfg_parser.get('SMARTAPI_LOGIN', 'CLIENT_CODE')
         self.password = cfg_parser.get('SMARTAPI_LOGIN', 'PASSWORD')
         self.totp_key = cfg_parser.get('SMARTAPI_LOGIN', 'TOTP_KEY')
+        self.instruments_list = []
 
     @staticmethod
     def _get_time(time):
@@ -106,7 +107,12 @@ class BackTestingApp:
         }
         self.logger.info("Sending candle request for {}".format(candle_info_params))
         api_helper = SmartApiHelper(self.api_key, self.client_code, self.password, self.totp_key)
-        return api_helper.get_candle_info(candle_info_params)['data']
+        result =  api_helper.get_candle_info(candle_info_params)
+        try:
+            return result['data']
+        except Exception as e:
+            self.logger.error(result)
+            return []
 
     def load_data(self):
         """
@@ -114,15 +120,21 @@ class BackTestingApp:
 
         :return: None
         """
+        self.logger.info("Loading data")
         self.candle_info_df = pd.DataFrame.from_records([],
                                                         columns=['Timestamp', 'OPEN', 'HIGH', 'LOW', 'CLOSE', 'VOLUME'])
 
         for _date in pd.date_range(self.start_date, self.end_date):
+            self.logger.info("Loading data for {} instruments, date: {}".format(len(self.instruments_list), _date))
+            count = 0
             for token, exchange in self.instruments_list:
+                count += 1
+                self.logger.info("{}/{}: Loading data for date: {}, {}, {}".format(count, len(self.instruments_list), _date, token, exchange))
+                results = None
                 results = self._get_candle_info_results(_date, token, exchange)
                 if not results:
                     self.logger.warning("No data available for Date: {}, "
-                                      "Token: {}, Exchange: {}".format(_date, token, exchange))
+                                    "Token: {}, Exchange: {}".format(_date, token, exchange))
                     continue
                 df = pd.DataFrame.from_records(results,
                                                columns=['Timestamp', 'OPEN', 'HIGH', 'LOW', 'CLOSE', 'VOLUME'])
