@@ -8,7 +8,7 @@ with open("requirements.txt", "r") as fh:
 with open("README.md", "r") as fh:
     long_description = fh.read()
 
-__version__ = "3.0.0"
+__version__ = "3.1.0"
 
 setuptools.setup(
     name="alphatools_jv",
